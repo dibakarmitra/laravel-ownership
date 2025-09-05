@@ -1,5 +1,5 @@
 {
-    "name": "dibakarmitra/laravel-ownership",
+    "name": "dibakar/laravel-ownership",
     "description": "Flexible ownership management package for Laravel with single & multiple ownership support. with traits, scopes, and policies.",
     "keywords": ["laravel", "ownership", "permissions", "roles", "multi-owner", "single-owner", "ownership-management", "laravel-ownership", "gate"],
     "type": "library",
@@ -40,7 +40,7 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
+    "prefer-stable": false,
     "config": {
         "sort-packages": true,
         "preferred-install": "dist"
