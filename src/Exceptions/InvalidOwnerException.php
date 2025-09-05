@@ -11,9 +11,10 @@ class InvalidOwnerException extends Exception
     /**
      * Create a new exception instance.
      *
-     * @param  string  $message
-     * @param  int  $code
-     * @param  \Throwable|null  $previous
+     * @param string          $message
+     * @param int             $code
+     * @param \Throwable|null $previous
+     *
      * @return void
      */
     public function __construct(

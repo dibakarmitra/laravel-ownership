@@ -25,8 +25,8 @@ class Ownership extends Model
 
     protected $casts = [
         'permissions' => 'array',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'created_at'  => 'datetime',
+        'updated_at'  => 'datetime',
     ];
 
     protected $appends = [
@@ -51,7 +51,7 @@ class Ownership extends Model
 
     public function getOwnerNameAttribute(): ?string
     {
-        if (! $this->relationLoaded('owner')) {
+        if (!$this->relationLoaded('owner')) {
             return null;
         }
 
@@ -60,7 +60,7 @@ class Ownership extends Model
 
     public function getOwnableNameAttribute(): ?string
     {
-        if (! $this->relationLoaded('ownable')) {
+        if (!$this->relationLoaded('ownable')) {
             return null;
         }
 
@@ -80,7 +80,7 @@ class Ownership extends Model
             return $this->ownable->title;
         }
 
-        return Str::title(Str::singular($this->ownable->getTable())) . ' #' . $this->ownable->getKey();
+        return Str::title(Str::singular($this->ownable->getTable())).' #'.$this->ownable->getKey();
     }
 
     public function scopeWithRole($query, string $role)
@@ -111,7 +111,7 @@ class Ownership extends Model
         }
 
         $customPermissions = $this->permissions ?? [];
-        
+
         return in_array($permission, $customPermissions);
     }
 }

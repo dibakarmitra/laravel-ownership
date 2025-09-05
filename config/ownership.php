@@ -79,8 +79,8 @@ return [
     */
     'cache' => [
         'enabled' => true,
-        'ttl' => 3600, // Cache time-to-live in seconds
-        'prefix' => 'ownership_',
+        'ttl'     => 3600, // Cache time-to-live in seconds
+        'prefix'  => 'ownership_',
     ],
 
     /*
@@ -92,9 +92,9 @@ return [
     |
     */
     'events' => [
-        'ownership_created' => true,
-        'ownership_updated' => true,
-        'ownership_deleted' => true,
+        'ownership_created'     => true,
+        'ownership_updated'     => true,
+        'ownership_deleted'     => true,
         'ownership_transferred' => true,
     ],
 
@@ -116,7 +116,7 @@ return [
         |
         */
         'table_name' => 'ownerships',
-        
+
         /*
         |--------------------------------------------------------------------------
         | Default Role
@@ -126,7 +126,7 @@ return [
         |
         */
         'default_role' => 'owner',
-        
+
         /*
         |--------------------------------------------------------------------------
         | Available Roles
@@ -138,27 +138,27 @@ return [
         */
         'roles' => [
             'owner' => [
-                'name' => 'Owner',
+                'name'        => 'Owner',
                 'description' => 'Full access to the resource',
                 'permissions' => ['*'], // Wildcard means all permissions
             ],
             'admin' => [
-                'name' => 'Administrator',
+                'name'        => 'Administrator',
                 'description' => 'Can manage all aspects except ownership',
                 'permissions' => ['view', 'edit', 'delete', 'manage_users'],
             ],
             'editor' => [
-                'name' => 'Editor',
+                'name'        => 'Editor',
                 'description' => 'Can view and edit content',
                 'permissions' => ['view', 'edit'],
             ],
             'viewer' => [
-                'name' => 'Viewer',
+                'name'        => 'Viewer',
                 'description' => 'Can only view content',
                 'permissions' => ['view'],
             ],
         ],
-        
+
         /*
         |--------------------------------------------------------------------------
         | Auto Assign Creator
@@ -179,7 +179,7 @@ return [
         |
         */
         'validation' => [
-            'max_owners' => null, // null for unlimited, or set a maximum number of owners
+            'max_owners'   => null, // null for unlimited, or set a maximum number of owners
             'unique_owner' => true, // Whether an owner can only be assigned once
         ],
     ],

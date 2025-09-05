@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Dibakar\Ownership\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Collection;
-use Dibakar\Ownership\Models\Ownership as OwnershipModel;
 use Dibakar\Ownership\Events\OwnershipCreated;
 use Dibakar\Ownership\Events\OwnershipDeleted;
 use Dibakar\Ownership\Events\OwnershipTransferred;
 use Dibakar\Ownership\Events\OwnershipUpdated;
 use Dibakar\Ownership\Exceptions\InvalidOwnerException;
 use Dibakar\Ownership\Facades\Ownership;
+use Dibakar\Ownership\Models\Ownership as OwnershipModel;
 use Dibakar\Ownership\Scopes\OwnedByCurrentScope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Collection;
 
 trait HasOwnership
 {
@@ -31,7 +31,7 @@ trait HasOwnership
                 if (!$model->getAttribute($idAttr) && !$model->getAttribute($typeAttr)) {
                     if ($owner = Ownership::current()) {
                         $model->{$typeAttr} = $owner->getMorphClass();
-                        $model->{$idAttr}   = $owner->getKey();
+                        $model->{$idAttr} = $owner->getKey();
                     }
                 }
             }
@@ -39,7 +39,7 @@ trait HasOwnership
 
         static::deleting(function (Model $model) {
             if (config('ownership.mode') === 'multiple') {
-                if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+                if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
                     return;
                 }
                 $model->ownerships()->delete();
@@ -47,7 +47,7 @@ trait HasOwnership
         });
 
         if (config('ownership.apply_global_scope', true) && config('ownership.mode') === 'single') {
-            static::addGlobalScope(new OwnedByCurrentScope);
+            static::addGlobalScope(new OwnedByCurrentScope());
         }
     }
 
@@ -61,7 +61,9 @@ trait HasOwnership
         if (config('ownership.mode') === 'single') {
             $name = config('ownership.morph_name', 'owner');
             $ownerModel = $owner instanceof Model ? $owner : Ownership::current();
-            if (!$ownerModel) return $query;
+            if (!$ownerModel) {
+                return $query;
+            }
 
             return $query
                 ->where("{$this->getTable()}.{$name}_type", $ownerModel->getMorphClass())
@@ -82,7 +84,9 @@ trait HasOwnership
         if (config('ownership.mode') === 'single') {
             $name = config('ownership.morph_name', 'owner');
             $ownerModel = $owner instanceof Model ? $owner : Ownership::current();
-            if (!$ownerModel) return false;
+            if (!$ownerModel) {
+                return false;
+            }
 
             return $this->getAttribute("{$name}_type") === $ownerModel->getMorphClass()
                 && (string) $this->getAttribute("{$name}_id") === (string) $ownerModel->getKey();
@@ -104,7 +108,7 @@ trait HasOwnership
     ): OwnershipModel {
         $role = $role ?? config('ownership.multiple_ownership.default_role');
 
-        if (! $this->isValidRole($role)) {
+        if (!$this->isValidRole($role)) {
             throw new InvalidOwnerException("The role [{$role}] is not valid.");
         }
 
@@ -115,16 +119,17 @@ trait HasOwnership
 
         if ($existingOwnership) {
             $existingOwnership->update([
-                'role' => $role,
+                'role'        => $role,
                 'permissions' => $permissions ? json_encode($permissions) : null,
             ]);
+
             return $existingOwnership;
         }
 
         $ownership = $this->ownerships()->create([
-            'owner_id' => $owner->getKey(),
-            'owner_type' => $owner->getMorphClass(),
-            'role' => $role,
+            'owner_id'    => $owner->getKey(),
+            'owner_type'  => $owner->getMorphClass(),
+            'role'        => $role,
             'permissions' => $permissions ? json_encode($permissions) : null,
         ]);
 
@@ -142,22 +147,22 @@ trait HasOwnership
         bool $fireEvent = true
     ): array {
         $added = [];
-    
+
         foreach ($owners as $owner) {
-            if (! $owner instanceof Model) {
-                throw new InvalidOwnerException("Each owner must be an instance of Illuminate\\Database\\Eloquent\\Model.");
+            if (!$owner instanceof Model) {
+                throw new InvalidOwnerException('Each owner must be an instance of Illuminate\\Database\\Eloquent\\Model.');
             }
-    
+
             $added[] = $this->addOwner($owner, $role, $permissions, $fireEvent);
         }
-    
+
         return $added;
-    }    
+    }
 
     public function setOwner(Model $owner, bool $fireEvent = true): bool
     {
         if (config('ownership.mode') !== 'single') {
-            throw new InvalidOwnerException("setOwner is only available in single ownership mode.");
+            throw new InvalidOwnerException('setOwner is only available in single ownership mode.');
         }
 
         $name = config('ownership.morph_name', 'owner');
@@ -168,7 +173,7 @@ trait HasOwnership
 
         if ($saved && $fireEvent && config('ownership.events.ownership_updated', true)) {
             event(new OwnershipUpdated($this, [
-                'owner_id' => $owner->getKey(),
+                'owner_id'   => $owner->getKey(),
                 'owner_type' => $owner->getMorphClass(),
             ]));
         }
@@ -185,7 +190,7 @@ trait HasOwnership
 
         if ($deleted > 0 && $fireEvent && config('ownership.events.ownership_deleted', true)) {
             event(new OwnershipDeleted($this, [
-                'owner_id' => $owner->getKey(),
+                'owner_id'   => $owner->getKey(),
                 'owner_type' => $owner->getMorphClass(),
             ]));
         }
@@ -196,7 +201,7 @@ trait HasOwnership
     public function clearOwner(bool $fireEvent = true): bool
     {
         if (config('ownership.mode') !== 'single') {
-            throw new InvalidOwnerException("clearOwner is only available in single ownership mode.");
+            throw new InvalidOwnerException('clearOwner is only available in single ownership mode.');
         }
 
         $name = config('ownership.morph_name', 'owner');
@@ -206,7 +211,7 @@ trait HasOwnership
 
         if ($saved && $fireEvent && config('ownership.events.ownership_deleted', true)) {
             event(new OwnershipDeleted($this, [
-                'owner_id' => null,
+                'owner_id'   => null,
                 'owner_type' => null,
             ]));
         }
@@ -225,7 +230,7 @@ trait HasOwnership
     public function getOwner(): ?Model
     {
         if (config('ownership.mode') !== 'single') {
-            throw new InvalidOwnerException("getOwner is only available in single ownership mode.");
+            throw new InvalidOwnerException('getOwner is only available in single ownership mode.');
         }
 
         return $this->owner;
@@ -237,6 +242,7 @@ trait HasOwnership
         if ($ownerType) {
             $query->where('owner_type', $ownerType);
         }
+
         return $query->get()->map(fn ($ownership) => $ownership->owner);
     }
 
@@ -250,10 +256,12 @@ trait HasOwnership
         }
 
         $ownership = $this->getOwnershipRecord($from);
-        if (! $ownership) return false;
+        if (!$ownership) {
+            return false;
+        }
 
         $ownership->update([
-            'owner_id' => $to->getKey(),
+            'owner_id'   => $to->getKey(),
             'owner_type' => $to->getMorphClass(),
         ]);
 
@@ -283,7 +291,7 @@ trait HasOwnership
 
     public function updateOwnerRole(Model $owner, string $role, bool $fireEvent = true): bool
     {
-        if (! $this->isValidRole($role)) {
+        if (!$this->isValidRole($role)) {
             throw new InvalidOwnerException("The role [{$role}] is not valid.");
         }
 
@@ -294,9 +302,9 @@ trait HasOwnership
 
         if ($updated > 0 && $fireEvent && config('ownership.events.ownership_updated', true)) {
             event(new OwnershipUpdated($this, [
-                'owner_id' => $owner->getKey(),
+                'owner_id'   => $owner->getKey(),
                 'owner_type' => $owner->getMorphClass(),
-                'role' => $role,
+                'role'       => $role,
             ]));
         }
 
@@ -306,7 +314,7 @@ trait HasOwnership
     public function syncOwners(array $owners, ?string $role = null, ?array $permissions = null): void
     {
         if (config('ownership.mode') !== 'multiple') {
-            throw new InvalidOwnerException("syncOwners is only available in multiple ownership mode.");
+            throw new InvalidOwnerException('syncOwners is only available in multiple ownership mode.');
         }
 
         $this->ownerships()->delete();
@@ -330,6 +338,7 @@ trait HasOwnership
         if (config('ownership.mode') === 'single') {
             return $this->getOwner() ? 1 : 0;
         }
+
         return $this->ownerships()->count();
     }
 
@@ -338,6 +347,7 @@ trait HasOwnership
         if (config('ownership.mode') === 'single') {
             return $this->getAttribute(config('ownership.role_column', 'owner_role'));
         }
+
         return null;
     }
 
@@ -353,7 +363,7 @@ trait HasOwnership
     {
         $ownership = $this->getOwnershipRecord($owner);
 
-        if (! $ownership) {
+        if (!$ownership) {
             return false;
         }
 
@@ -379,6 +389,7 @@ trait HasOwnership
     protected function isValidRole(string $role): bool
     {
         $roles = config('ownership.multiple_ownership.roles', []);
+
         return array_key_exists($role, $roles) || in_array($role, $roles, true);
     }
 }
