@@ -4,7 +4,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/dibakar/laravel-ownership.svg?style=flat-square)](https://packagist.org/packages/dibakar/laravel-ownership)
 [![PHP Version](https://img.shields.io/packagist/php-v/dibakar/laravel-ownership.svg?style=flat-square)](https://packagist.org/packages/dibakar/laravel-ownership)
 [![License](https://img.shields.io/packagist/l/dibakar/laravel-ownership?style=flat-square)](https://packagist.org/packages/dibakar/laravel-ownership)
-[![Tests](https://github.com/dibakar/laravel-ownership/actions/workflows/run-tests.yml/badge.svg)](https://github.com/dibakar/laravel-ownership/actions)
+[![Tests](https://github.com/dibakarmitra/laravel-ownership/actions/workflows/run-tests.yml/badge.svg)](https://github.com/dibakar/laravel-ownership/actions)
 [![Code Style](https://github.styleci.io/repos/123456789/shield?branch=main)](https://github.styleci.io/repos/123456789)
 
 A comprehensive ownership management system for Laravel applications. This package provides an elegant way to handle both single and multiple ownership scenarios with role-based permissions, events, and query scopes.
