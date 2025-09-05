@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Dibakar\Ownership\Events;
 
-use Illuminate\Database\Eloquent\Model;
 use Dibakar\Ownership\Models\Ownership;
+use Illuminate\Database\Eloquent\Model;
 
 class OwnershipCreated
 {
@@ -28,6 +28,7 @@ class OwnershipCreated
      *
      * @param \Illuminate\Database\Eloquent\Model $ownable
      * @param \Dibakar\Ownership\Models\Ownership $ownership
+     *
      * @return void
      */
     public function __construct(Model $ownable, Ownership $ownership)
