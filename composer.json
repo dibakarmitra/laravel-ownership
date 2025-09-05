@@ -1,0 +1,42 @@
+{
+    "name": "dibakar/laravel-ownership",
+    "description": "Add model ownership (user/team) with traits, scopes, and policies.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.1",
+        "illuminate/contracts": "^9.0|^10.0|^11.0|^12.0",
+        "illuminate/database": "^9.0|^10.0|^11.0|^12.0",
+        "illuminate/support": "^9.0|^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^7.0|^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dibakar\\Ownership\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dibakar\\Ownership\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Dibakar\\Ownership\\OwnershipServiceProvider"
+            ],
+            "aliases": {
+                "Ownership": "Dibakar\\Ownership\\Facades\\Ownership"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist"
+    },
+    "version": "1.0.0"
+}
