@@ -2,18 +2,18 @@
 
 namespace Dibakar\Ownership;
 
+use Dibakar\Ownership\Support\OwnershipManager;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Schema\Blueprint;
-use Dibakar\Ownership\Support\OwnershipManager;
 
 class OwnershipServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $configPath = __DIR__ . '/../config/ownership.php';
+        $configPath = __DIR__.'/../config/ownership.php';
 
         if (File::exists($configPath)) {
             $this->mergeConfigFrom($configPath, 'ownership');
@@ -32,14 +32,14 @@ class OwnershipServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/ownership.php' => config_path('ownership.php'),
+                __DIR__.'/../config/ownership.php' => config_path('ownership.php'),
             ], 'ownership-config');
 
             $this->publishes([
-                __DIR__ . '/../config/ownership.php' => config_path('ownership.php'),
+                __DIR__.'/../config/ownership.php' => config_path('ownership.php'),
             ], 'config');
 
-            $migrationsPath = __DIR__ . '/../database/migrations';
+            $migrationsPath = __DIR__.'/../database/migrations';
             if (File::isDirectory($migrationsPath)) {
                 $this->publishes([
                     $migrationsPath => database_path('migrations'),
@@ -55,11 +55,11 @@ class OwnershipServiceProvider extends ServiceProvider
 
     protected function registerSchemaMacros(): void
     {
-        Blueprint::macro('ownerMorphs', function (string $name = null) {
+        Blueprint::macro('ownerMorphs', function (?string $name = null) {
             /** @var \Illuminate\Database\Schema\Blueprint $this */
             $name = $name ?: config('ownership.morph_name', 'owner');
             $this->nullableMorphs($name);
-            $this->index([$name . '_type', $name . '_id'], $name . '_index');
+            $this->index([$name.'_type', $name.'_id'], $name.'_index');
         });
     }
 
@@ -68,6 +68,7 @@ class OwnershipServiceProvider extends ServiceProvider
         // @owned($model) ... @endowned
         Blade::if('owned', function ($model) {
             $user = Auth::guard(config('ownership.guard'))->user();
+
             return $model
                 && method_exists($model, 'isOwnedBy')
                 && $model->isOwnedBy($user);
@@ -76,12 +77,14 @@ class OwnershipServiceProvider extends ServiceProvider
         // @canOwn($ability, $model)
         Blade::if('canOwn', function ($ability, $model) {
             $user = Auth::guard(config('ownership.guard'))->user();
+
             return $user && $user->can($ability, $model);
         });
 
         // @isOwner($model)
         Blade::if('isOwner', function ($model) {
             $user = Auth::guard(config('ownership.guard'))->user();
+
             return $model
                 && method_exists($model, 'isOwnedBy')
                 && $model->isOwnedBy($user);

@@ -33,8 +33,9 @@ class OwnershipTransferred
      * Create a new event instance.
      *
      * @param \Illuminate\Database\Eloquent\Model $ownable
-     * @param array $previousOwner
-     * @param array $newOwner
+     * @param array                               $previousOwner
+     * @param array                               $newOwner
+     *
      * @return void
      */
     public function __construct(Model $ownable, Model $previousOwner, Model $newOwner)

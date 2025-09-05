@@ -26,7 +26,8 @@ class OwnershipUpdated
      * Create a new event instance.
      *
      * @param \Illuminate\Database\Eloquent\Model $ownable
-     * @param array $ownershipData
+     * @param array                               $ownershipData
+     *
      * @return void
      */
     public function __construct(Model $ownable, array $ownershipData)
