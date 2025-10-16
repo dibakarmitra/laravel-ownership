@@ -18,8 +18,9 @@ A comprehensive ownership management system for Laravel applications. This packa
 - **Performance Optimized**: Built-in caching for ownership checks
 - **Type Safety**: Strict type declarations and modern PHP features
 - **Laravel Integration**: Seamless integration with Laravel's authentication system
-- **Morphable Owners**: Support for any authenticatable model as an owner
+- **Morphable Owners**: Support for any model as an owner
 - **Bulk Operations**: Manage multiple owners at once with sync methods
+- **Bidirectional Relationships**: Both owners and ownable models have access to each other
 
 ## Installation
 
@@ -40,6 +41,61 @@ php artisan vendor:publish --provider="Dibakar\\Ownership\\OwnershipServiceProvi
 ```bash
 php artisan vendor:publish --provider="Dibakar\\Ownership\\OwnershipServiceProvider" --tag=migrations
 php artisan migrate
+```
+
+## IsOwner Trait Methods
+
+### Check Ownership
+
+```php
+// Check if the user owns a document
+$user->owns($document);
+
+// Check if the user owns a document with a specific role
+$user->owns($document, 'admin');
+```
+
+### Get Owned Items
+
+```php
+// Get all documents owned by the user
+$documents = $user->getOwnedItems(Document::class);
+
+// Get all documents where user has a specific role
+$adminDocuments = $user->getOwnedItems(Document::class, 'admin');
+```
+
+### Transfer Ownership
+
+```php
+// Transfer all documents to another user
+$user->transferOwnershipTo($newUser);
+
+// Transfer only specific type of items
+$user->transferOwnershipTo($newUser, Document::class);
+```
+
+### Count Owned Items
+
+```php
+// Count all owned items
+$count = $user->countOwnedItems();
+
+// Count items of a specific type
+$docCount = $user->countOwnedItems(Document::class);
+
+// Count items with a specific role
+$adminDocCount = $user->countOwnedItems(Document::class, 'admin');
+```
+
+### Ownership Relationship
+
+```php
+// Get all ownership records
+$ownerships = $user->ownerships;
+
+// Get all owned items through the relationship
+$items = $user->ownerships->map->ownable;
 ```
 
 ## Configuration
@@ -126,11 +182,37 @@ return [
 
 ### Single Ownership Mode
 
-Add the `HasOwnership` trait to your model for single ownership:
+## Basic Usage
+
+### For Ownable Models (Models that can be owned)
+
+Add the `HasOwnership` trait to your model:
 
 ```php
 use Illuminate\Database\Eloquent\Model;
 use Dibakar\Ownership\Traits\HasOwnership;
+
+class Document extends Model
+{
+    use HasOwnership;
+    // ...
+}
+```
+
+### For Owner Models (Models that can own other models)
+
+Add the `IsOwner` trait to models that can own other models (like User, Team, etc.):
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use Dibakar\Ownership\Traits\IsOwner;
+
+class User extends Authenticatable
+{
+    use IsOwner;
+    // ...
+}
+```
 
 class Post extends Model
 {
@@ -361,6 +443,61 @@ composer test
 If you discover any security related issues, please email dibakarmitra07@gmail.com instead of using the issue tracker.
 
 ## License
+
+## Example Usage
+
+### User Model
+
+```php
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Dibakar\Ownership\Traits\IsOwner;
+
+class User extends Authenticatable
+{
+    use IsOwner;
+    // ...
+}
+```
+
+### Document Model
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use Dibakar\Ownership\Traits\HasOwnership;
+
+class Document extends Model
+{
+    use HasOwnership;
+    // ...
+}
+```
+
+### Controller Example
+
+```php
+class DocumentController extends Controller
+{
+    public function store(Request $request)
+    {
+        $document = Document::create($request->all());
+        
+        // Set the current user as the owner with admin role
+        $document->addOwner(auth()->user(), 'admin');
+        
+        return response()->json($document, 201);
+    }
+    
+    public function transfer(Document $document, User $newOwner)
+    {
+        $this->authorize('update', $document);
+        
+        // Transfer ownership
+        $document->getOwner()->transferOwnershipTo($newOwner);
+        
+        return response()->json(['message' => 'Ownership transferred']);
+    }
+}
+```
 
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
 

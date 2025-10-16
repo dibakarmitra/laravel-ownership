@@ -4,7 +4,7 @@ namespace Dibakar\Ownership\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-interface OwnableContract
+interface OwnershipContract
 {
     public function owner(): MorphTo;
 
