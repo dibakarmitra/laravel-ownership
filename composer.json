@@ -45,7 +45,6 @@
         "sort-packages": true,
         "preferred-install": "dist"
     },
-    "version": "1.0.1",
     "repositories": [
         {
             "type": "vcs",
